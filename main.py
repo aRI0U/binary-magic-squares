@@ -52,8 +52,8 @@ def generate_bms(k, m, n=None):
 
         to_check = a1 | random_subset(a2, km - a1.sum())
 
-        s[to_check] += 1
-        bms[:, t][to_check] = True
+        s += to_check
+        bms[:, t] = to_check
 
     return bms.T if transpose else bms
 

@@ -8,14 +8,11 @@ def random_subset(mask, n_elems):  # TODO: see if can be optimized
     if n_elems < 0 or n_elems > len(mask):
         raise ValueError("Invalid value for 'n_elems' parameter.")
 
-    indices = np.arange(len(mask))[mask]
+    indices = np.where(mask)[0]
+    np.random.shuffle(indices)
 
-    if n_elems > len(indices):
-        raise ValueError("The number of elements requested exceeds the number of elements in the mask.")
-
-    subset_indices = np.random.choice(indices, n_elems, replace=False)
-    subset = np.zeros(len(mask), dtype=bool)
-    subset[subset_indices] = True
+    subset = np.zeros_like(mask)
+    subset[indices[:n_elems]] = True
 
     return subset
 
@@ -39,7 +36,7 @@ def generate_bms(k, m, n=None):
         m, n = n, m
 
     q, r = divmod(m, n)
-    assert r == 0, "For non-trivial magic squares to exist, the number of rows and columns must divide the other."
+    assert r == 0, "For non-trivial magic squares to exist, the number of rows and columns must divide each other."
     km, kn = q*k, k
 
     bms = np.zeros((m, n), dtype=bool)

@@ -1,9 +1,7 @@
-from typing import Tuple
-
 import torch
 
 
-def batch_random_subset(mask: torch.BoolTensor, n_elems: torch.LongTensor) -> torch.BoolTensor:
+def _batch_random_subset(mask: torch.BoolTensor, n_elems: torch.LongTensor) -> torch.BoolTensor:
     r"""Randomly creates a submask of the original one so that each row i has exactly n_elems[i] True elements.
 
     Args:
@@ -39,16 +37,14 @@ def batch_random_subset(mask: torch.BoolTensor, n_elems: torch.LongTensor) -> to
     return final_mask
 
 
-def generate_bms(m: int,
+def generate_bms(k: int,
+                 m: int,
                  n: int,
-                 masking_ratio: float,
                  num_masks: int = 1,
-                 device: torch.device = torch.device("cpu")) -> Tuple[torch.BoolTensor, torch.BoolTensor]:
-
+                 device: torch.device = torch.device("cpu")) -> torch.BoolTensor:
     r""""""
     # By default we generate a square (i.e. m = n)
     n = n or m
-    k = round(masking_ratio * n)
 
     # the transpose of a BMS is also a BMS, so we eventually transpose for having m >= n
     # so that we always iterate on the smallest dimension
@@ -68,7 +64,7 @@ def generate_bms(m: int,
         a3 = torch.eq(s, kn)
         a2 = ~torch.logical_or(a1, a3)
 
-        to_check = a1 | batch_random_subset(a2, km - a1.sum(dim=1))
+        to_check = a1 | _batch_random_subset(a2, km - a1.sum(dim=1))
 
         s += to_check
         bms[:, :, t] = to_check
@@ -76,7 +72,7 @@ def generate_bms(m: int,
     if transpose:
         bms = bms.transpose(-2, -1)
 
-    return bms, ~bms
+    return bms
 
 
 if __name__ == '__main__':
@@ -86,5 +82,5 @@ if __name__ == '__main__':
 
     a, b, c = int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3]) if len(sys.argv) > 3 else None
 
-    mat, _ = generate_bms(b, c, a / c, 2)
+    mat = generate_bms(a, b, c, 2)
     print(mat.long())

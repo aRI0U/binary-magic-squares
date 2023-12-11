@@ -50,3 +50,7 @@ def test_generate_bms(k, n):
 def test_shape(k, m, n):
     assert generate_bms(k, m, n).shape == (m, n)
 
+
+def test_invalid_shape():
+    with pytest.raises(AssertionError):
+        generate_bms(3, 5, 8)

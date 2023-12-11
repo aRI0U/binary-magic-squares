@@ -4,19 +4,17 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "binary-magic-squares"
-version = "0.1.0"
+version = "0.1.4"
 authors = [
     {name = "Alain Riou", email = "alain.riou@sony.com"}
 ]
 description = "Generate Binary Magic Squares"
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.8"
-license = {text = "LGPL-3.0"}
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3.6",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",

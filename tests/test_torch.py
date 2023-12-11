@@ -100,3 +100,12 @@ def test_shape_no_batch_dim(k, m, n):
 def test_shape_batch_dim(k, m, n, masks):
     assert generate_bms(k, m, n, num_masks=masks).shape == (masks, m, n)
 
+
+@pytest.mark.parametrize("device", [torch.device("cpu"), torch.device("cuda")])
+def test_device(device):
+    assert generate_bms(3, 5, device=device).device == device
+
+
+def test_invalid_shape():
+    with pytest.raises(AssertionError):
+        generate_bms(3, 5, 8)

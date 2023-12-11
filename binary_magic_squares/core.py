@@ -55,12 +55,19 @@ def generate_bms(k, m, n=None):
     return bms.T if transpose else bms
 
 
-if __name__ == '__main__':
-    import sys
+def is_bms(mask):
+    """
+    Args:
+        mask (numpy.ndarray): boolean mask. Shape (m, n)
 
-    assert len(sys.argv) >= 3
+    Returns:
+        bool: Whether the mask is a Binary Magic Square or not.
+    """
+    assert isinstance(mask, np.ndarray) and mask.dtype == np.bool_, "Only bool ndarrays can be Binary Magic Squares"
 
-    k, m, n = int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3]) if len(sys.argv) > 3 else None
+    assert mask.ndim == 2, "Shape of the mask should be (m, n)"
 
-    mat = generate_bms(k, m, n)
-    print(mat.astype(int))
+    sum_rows = np.sum(mask, axis=0)
+    sum_cols = np.sum(mask, axis=1)
+
+    return np.all(np.equal(sum_rows, sum_rows[0])) and np.all(np.equal(sum_cols, sum_cols[0]))

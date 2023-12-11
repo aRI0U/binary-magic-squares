@@ -1,7 +1,7 @@
 import torch
 
 
-def _batch_random_subset(mask: torch.BoolTensor, n_elems: torch.LongTensor) -> torch.BoolTensor:
+def _batch_random_subset(mask: torch.BoolTensor, n_elems: torch.LongTensor) -> torch.Tensor:
     r"""Randomly creates a submask of the original one so that each row i has exactly n_elems[i] True elements.
 
     Args:
@@ -31,7 +31,6 @@ def _batch_random_subset(mask: torch.BoolTensor, n_elems: torch.LongTensor) -> t
     true_indices = true_indices[to_keep_indices + offset]
 
     final_mask = torch.zeros_like(mask)
-    # final_mask.scatter_(1, true_indices, 1)
     final_mask[true_indices[:, 0], true_indices[:, 1]] = True
 
     return final_mask
@@ -39,9 +38,9 @@ def _batch_random_subset(mask: torch.BoolTensor, n_elems: torch.LongTensor) -> t
 
 def generate_bms(k: int,
                  m: int,
-                 n: int,
-                 num_masks: int = 1,
-                 device: torch.device = torch.device("cpu")) -> torch.BoolTensor:
+                 n: int | None = None,
+                 num_masks: int | None = None,
+                 device: torch.device = torch.device("cpu")) -> torch.Tensor:
     r""""""
     # By default we generate a square (i.e. m = n)
     n = n or m
@@ -56,6 +55,9 @@ def generate_bms(k: int,
     assert r == 0, "For non-trivial magic squares to exist, the number of rows and columns must divide each other."
     km, kn = q*k, k
 
+    not_batched = num_masks is None
+    num_masks = num_masks or 1
+
     bms = torch.zeros(num_masks, m, n, dtype=torch.bool, device=device)
     s = torch.zeros(num_masks, m, dtype=torch.long, device=device)
 
@@ -64,7 +66,7 @@ def generate_bms(k: int,
         a3 = torch.eq(s, kn)
         a2 = ~torch.logical_or(a1, a3)
 
-        to_check = a1 | _batch_random_subset(a2, km - a1.sum(dim=1))
+        to_check = a1 | _batch_random_subset(a2, km - a1.sum(dim=-1))
 
         s += to_check
         bms[:, :, t] = to_check
@@ -72,15 +74,29 @@ def generate_bms(k: int,
     if transpose:
         bms = bms.transpose(-2, -1)
 
+    if not_batched:
+        bms.squeeze_(0)
+
     return bms
 
 
-if __name__ == '__main__':
-    import sys
+def is_bms(masks: torch.Tensor) -> bool:
+    r"""
 
-    assert len(sys.argv) >= 3
+    Args:
+        masks (torch.Tensor): boolean mask (or batch of masks). Shape (*, m, n)
 
-    a, b, c = int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3]) if len(sys.argv) > 3 else None
+    Returns:
+        bool: Whether the masks all are Binary Magic Squares or not.
+    """
+    assert torch.is_tensor(masks) and masks.dtype == torch.bool, "Only BoolTensors can be Binary Magic Squares"
 
-    mat = generate_bms(a, b, c, 2)
-    print(mat.long())
+    assert masks.ndim >= 2
+
+    sum_rows = masks.sum(dim=-2)
+
+    if not torch.all(torch.eq(sum_rows, sum_rows[..., 0].unsqueeze(-1))):
+        return False
+
+    sum_cols = masks.sum(dim=-1)
+    return torch.all(torch.eq(sum_cols, sum_cols[..., 0].unsqueeze(-1))).item()

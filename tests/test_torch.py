@@ -101,6 +101,7 @@ def test_shape_batch_dim(k, m, n, masks):
     assert generate_bms(k, m, n, num_masks=masks).shape == (masks, m, n)
 
 
+@pytest.mark.skipif(not torch.cuda.is_available(), reason="GPU not available")
 @pytest.mark.parametrize("device", [torch.device("cpu"), torch.device("cuda")])
 def test_device(device):
     assert generate_bms(3, 5, device=device).device == device

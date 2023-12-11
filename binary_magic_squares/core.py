@@ -1,7 +1,9 @@
+from typing import Optional
+
 import numpy as np
 
 
-def random_subset(mask, n_elems):  # TODO: see if can be optimized
+def random_subset(mask, n_elems):
     if not isinstance(mask, np.ndarray) or not mask.dtype == bool:
         raise ValueError("The 'mask' parameter must be a boolean numpy array.")
 
@@ -17,7 +19,7 @@ def random_subset(mask, n_elems):  # TODO: see if can be optimized
     return subset
 
 
-def generate_bms(k, m, n=None):
+def generate_bms(k: int, m: int, n: Optional[int] = None) -> np.ndarray:
     r""""""
     # By default we generate a square (i.e. m = n)
     n = n or m
@@ -55,7 +57,7 @@ def generate_bms(k, m, n=None):
     return bms.T if transpose else bms
 
 
-def is_bms(mask):
+def is_bms(mask: np.ndarray) -> bool:
     """
     Args:
         mask (numpy.ndarray): boolean mask. Shape (m, n)

@@ -1,3 +1,5 @@
+from typing import Optional
+
 import torch
 
 
@@ -38,8 +40,8 @@ def _batch_random_subset(mask: torch.BoolTensor, n_elems: torch.LongTensor) -> t
 
 def generate_bms(k: int,
                  m: int,
-                 n: int | None = None,
-                 num_masks: int | None = None,
+                 n: Optional[int] = None,
+                 num_masks: Optional[int] = None,
                  device: torch.device = torch.device("cpu")) -> torch.Tensor:
     r""""""
     # By default we generate a square (i.e. m = n)

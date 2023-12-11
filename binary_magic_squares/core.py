@@ -20,7 +20,22 @@ def random_subset(mask, n_elems):
 
 
 def generate_bms(k: int, m: int, n: Optional[int] = None) -> np.ndarray:
-    r""""""
+    r"""Generate a Binary Magic Square (BMS), i.e. a boolean matrix such that the number of `True` elements in each
+    row/column is the same.
+
+    Contrary to what their name suggests, a BMS does not have to be a square matrix, however the number of rows must
+    divide the number of columns (or the opposite).
+    The number of `True` elements in each row will then divide the number of `True` elements in each column, with the
+    same ratio.
+
+    Args:
+        k (int): Sum of each row/column of the output matrix.
+        m (int): Number of rows of the output matrix.
+        n (int, optional): Number of columns of the output matrix. If not specified, a square m*m matrix will be generated.
+
+    Returns:
+        np.ndarray: Binary Magic Square of size m*n
+    """
     # By default we generate a square (i.e. m = n)
     n = n or m
 

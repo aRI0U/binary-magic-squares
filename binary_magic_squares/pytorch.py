@@ -43,7 +43,25 @@ def generate_bms(k: int,
                  n: Optional[int] = None,
                  num_masks: Optional[int] = None,
                  device: torch.device = torch.device("cpu")) -> torch.Tensor:
-    r""""""
+    r"""Generate a Binary Magic Square (BMS), i.e. a boolean matrix such that the number of `True` elements in each
+    row/column is the same.
+
+    Contrary to what their name suggests, a BMS does not have to be a square matrix, however the number of rows must
+    divide the number of columns (or the opposite).
+    The number of `True` elements in each row will then divide the number of `True` elements in each column, with the
+    same ratio.
+
+    Args:
+        k (int): Sum of each row/column of the output matrix.
+        m (int): Number of rows of the output matrix.
+        n (int, optional): Number of columns of the output matrix. If not specified, a square m*m matrix will be generated.
+        num_masks (int, optional): Number of BMS to generate. If not specified, only one BMS will be generated.
+        device (torch.device): Device to use to generate the BMS. Defaults to CPU.
+
+    Returns:
+        torch.Tensor: Binary Magic Square, shape (num_masks, m, n) if `num_masks` is not `None`, otherwise (m, n).
+    """
+
     # By default we generate a square (i.e. m = n)
     n = n or m
 
@@ -101,4 +119,4 @@ def is_bms(masks: torch.Tensor) -> bool:
         return False
 
     sum_cols = masks.sum(dim=-1)
-    return torch.all(torch.eq(sum_cols, sum_cols[..., 0].unsqueeze(-1))).item()
+    return torch.all(torch.eq(sum_cols, sum_cols[..., 0].unsqueeze(-1))).cpu().item()

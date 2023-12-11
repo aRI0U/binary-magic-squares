@@ -1,1 +1,8 @@
 .idea
+**/__pycache__
+
+# build files
+binary_magic_squares.egg-info
+build/
+dist/
+*.whl
